@@ -1,0 +1,5 @@
+name = JWPlayer Streaming
+description = "Allows users to stream media content using JWPlayer."
+package = JW Streaming
+core = 7.x
+files[] = jwstream.module

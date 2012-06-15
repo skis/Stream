@@ -1,0 +1,32 @@
+<?php
+function jwstream_field_schema($field) {
+  $schema['jwstream'] = array(
+    'description' => 'The base table for JWStream.',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+       ),
+       'stream' => array(
+          'description' => 'A boolean indicating whether streaming is enabled on this node.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => FALSE,
+       ),
+    ),
+    'indexes' => array(
+      'node_nid' => array('nid'),
+     ),
+     'foreign keys' => array(
+      'node_nid' => array(
+        'table' => 'node',
+        'columns' => array('nid' => 'nid'),
+      ),
+     ),
+  );
+  
+  return $schema;
+}
+
