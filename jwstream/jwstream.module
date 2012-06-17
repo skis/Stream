@@ -1,5 +1,6 @@
 <?php 
 drupal_add_css(drupal_get_path('module', 'jwstream') . '/css/jwstream.css');
+drupal_add_js('misc/jquery.js');
 drupal_add_js(drupal_get_path('module', 'jwstream') . '/mediaplayer-5.9/jwplayer.js');
 module_load_include('inc', 'jwstream');
 
@@ -46,6 +47,7 @@ function jwstream_field_widget_form(&$form, &$form_state, $field, $instance, $la
 		case 'jwstream_field_widget':
 			$widget += array(
 				'#type' => 'checkbox',
+				'#title' => 'Hello World!',
 				'#default_value' => !module_exists('file') ? 0 : $value,
         '#description' => t('Selecting this option enables streaming.'),
 			);
@@ -61,21 +63,22 @@ function jwstream_field_formatter_view($entity_type, $entity, $field, $instance,
     case 'jwstream_field_formatter':
       $node_path = explode('/', current_path());
       $player = drupal_get_path('module', 'jwstream') . '/mediaplayer-5.9/player.swf';
-      $html = '<div id="mediaplayer"></div>';
+      $html = "<div id='mediaplayer'></div>";
       $file_name = getMediaFilePath($node_path[1]);
-      $file_path = variable_get(file_public_path);
-      echo $html;
-      drupal_add_js('misc/jquery.js');
-      drupal_add_js('jwplayer("mediaplayer").setup(
+      $file_path = variable_get('file_public_path');
+      //echo $html;
+			drupal_add_js('$(' . $html . ').insertAfter("#content .section");', 'inline');
+      drupal_add_js('$(document).ready(function(){
+      jwplayer("mediaplayer").setup(
         {
           "flashplayer": "' . $player . '",
           "id": "playerID",
           "width": "480",
           "height": "270",
-          "file": "sites/default/files/' . $file_name .'",
+          "file": "' . $file_path . "/" . $file_name .'",
           "provider": "http",
           "http.startparam": "starttime"
-         });', 'inline');
+         });});', 'inline');
        break;
   }
 }
