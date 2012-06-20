@@ -4,6 +4,10 @@ function getMediaFilePath($nid = 0) {
     INNER JOIN {file_managed} fm ON fm.fid = fu.fid';
 
   $result = db_query($query, array(':nid' => $nid));
-  $filename = $result->fetchObject()->filename;
+  if($result->rowCount() >0 ) {
+	  $filename = $result->fetchObject()->filename;
+  }else {
+  	$filename = "";
+  }
   return $filename;
 }

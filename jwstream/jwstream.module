@@ -1,8 +1,7 @@
 <?php 
 drupal_add_css(drupal_get_path('module', 'jwstream') . '/css/jwstream.css');
 drupal_add_js('misc/jquery.js');
-drupal_add_js(drupal_get_path('module', 'jwstream') . '/mediaplayer-5.9/jwplayer.js');
-module_load_include('inc', 'jwstream');
+drupal_add_js(drupal_get_path('module', 'flowplayer') . '/flowplayer/example/flowplayer.min.js');
 
 function jwstream_field_info() {
   return array(
@@ -47,7 +46,6 @@ function jwstream_field_widget_form(&$form, &$form_state, $field, $instance, $la
 		case 'jwstream_field_widget':
 			$widget += array(
 				'#type' => 'checkbox',
-				'#title' => 'Hello World!',
 				'#default_value' => !module_exists('file') ? 0 : $value,
         '#description' => t('Selecting this option enables streaming.'),
 			);
@@ -60,27 +58,33 @@ function jwstream_field_widget_form(&$form, &$form_state, $field, $instance, $la
 
 function jwstream_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   switch ($display['type']) {
-    case 'jwstream_field_formatter':
-      $node_path = explode('/', current_path());
-      $player = drupal_get_path('module', 'jwstream') . '/mediaplayer-5.9/player.swf';
-      $html = "<div id='mediaplayer'></div>";
-      $file_name = getMediaFilePath($node_path[1]);
-      $file_path = variable_get('file_public_path');
-      //echo $html;
-			drupal_add_js('$(' . $html . ').insertAfter("#content .section");', 'inline');
-      drupal_add_js('$(document).ready(function(){
-      jwplayer("mediaplayer").setup(
-        {
-          "flashplayer": "' . $player . '",
-          "id": "playerID",
-          "width": "480",
-          "height": "270",
-          "file": "' . $file_path . "/" . $file_name .'",
-          "provider": "http",
-          "http.startparam": "starttime"
-         });});', 'inline');
-       break;
-  }
+      case 'jwstream_field_formatter':
+      		$node_path = explode('/', current_path());
+		      $player = drupal_get_path('module', 'flowplayer') . '/flowplayer/flowplayer.swf';
+		      $file_path = variable_get('file_public_path');
+
+		      if(count($node_path) > 1) {
+		      	module_load_include('inc', 'jwstream');
+
+		      	$file_name = getMediaFilePath($node_path[1]);
+
+			      if(strlen($file_name) > 0) {
+			      	$image = drupal_get_path('module', 'flowplayer') . '/flowplayer/play.jpeg';
+				      $anchorTxt = "<a href='" . $file_path . "/" . $file_name ."' style='display:block;width:500px;height:300px;' id='player'><img src='" . $image . "' alt='Click to Play' style='margin-left:auto;margin-right:auto;display:block;width: 50px;align:middle'/></a>";
+							drupal_add_js('$(document).ready(function(){
+				      	$("' . $anchorTxt . '").insertAfter("#content .section");
+								$("a").click(function(e){
+									var aid = $(this).attr("id");
+									$f(aid,"' . $player . '").play();
+									e.preventDefault();
+									return false;
+				      	});
+			      });', 'inline');
+			      }
+		      }
+		      
+      		break;
+		  }
 }
 
 function jwstream_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
